@@ -7,7 +7,7 @@ const client = new Client({
   intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent]
 });
 
-// Overlay map using Pinata gateway and properly encoded filenames
+// Overlay links from Pinata
 const overlayMap = {
   brownflex: 'https://black-bitter-reindeer-943.mypinata.cloud/ipfs/bafybeia7ofwilex5o4itjctphxg3jaguyqiaguklae7zlgzzjsmgi3i3vy/Brown%20Flex.png',
   ghostflex: 'https://black-bitter-reindeer-943.mypinata.cloud/ipfs/bafybeia7ofwilex5o4itjctphxg3jaguyqiaguklae7zlgzzjsmgi3i3vy/Ghost%20Flex.png',
@@ -22,6 +22,8 @@ const overlayMap = {
   goldflex: 'https://black-bitter-reindeer-943.mypinata.cloud/ipfs/bafybeia7ofwilex5o4itjctphxg3jaguyqiaguklae7zlgzzjsmgi3i3vy/Gold%20Flex.png'
 };
 
+const nftIpfsBase = 'https://ipfs.io/ipfs/bafybeigqhrsckizhwjow3dush4muyawn7jud2kbmy3akzxyby457njyr5e';
+
 client.once('ready', () => {
   console.log(`🔥 FridayFlex Bot is live as ${client.user.tag}`);
 });
@@ -29,11 +31,8 @@ client.once('ready', () => {
 client.on('messageCreate', async (message) => {
   if (!message.content.startsWith('!') || message.author.bot) return;
 
-  const content = message.content.slice(1).toLowerCase().trim(); // remove "!" and normalize
-  const helpCommand = content === 'help';
-
-  // Handle !help command
-  if (helpCommand) {
+  const content = message.content.slice(1).toLowerCase().trim();
+  if (content === 'help') {
     const available = Object.keys(overlayMap)
       .map(cmd => `• \`!${cmd} [token_id]\``)
       .join('\n');
@@ -41,18 +40,14 @@ client.on('messageCreate', async (message) => {
     return message.reply(
       `🛠️ **FridayFlex Bot Help**\n\n` +
       `To flex your Always Tired NFT with a themed overlay, use:\n` +
-      `\`!{flexstyle} {token_id}\`\n` +
-      `or\n` +
-      `\`!{flexstyle}{token_id}\`\n\n` +
-      `**Example:** \`!fireflex 245\` or \`!fireflex245\`\n\n` +
+      `\`!{flexstyle} {token_id}\` or \`!{flexstyle}{token_id}\`\n\n` +
+      `**Example:** \`!fireflex 245\`\n\n` +
       `**Available Flex Styles:**\n${available}`
     );
   }
 
-  // Try space-separated first
+  // Parse command and token ID (works with or without space)
   let [command, tokenId] = content.split(/\s+/);
-
-  // Fallback if no space was used
   if (!tokenId) {
     for (const key of Object.keys(overlayMap)) {
       if (content.startsWith(key)) {
@@ -69,31 +64,18 @@ client.on('messageCreate', async (message) => {
   }
 
   const overlayUrl = overlayMap[command];
-  const ipfsBase = 'bafybeigqhrsckizhwjow3dush4muyawn7jud2kbmy3akzxyby457njyr5e';
+  const nftUrl = `${nftIpfsBase}/${tokenId}.jpg`;
 
   try {
-    // Try loading NFT image from ipfs.io first
-    let nftImageBuffer;
+    console.log(`🖼️ Loading NFT: ${nftUrl}`);
+    console.log(`🎨 Overlay: ${overlayUrl}`);
 
-    try {
-      console.log(`🔍 Trying ipfs.io for token ${tokenId}`);
-      const nftRes = await axios.get(
-        `https://ipfs.io/ipfs/${ipfsBase}/${tokenId}.jpg`,
-        { responseType: 'arraybuffer' }
-      );
-      nftImageBuffer = nftRes.data;
-    } catch (err) {
-      console.warn(`⚠️ ipfs.io failed, retrying with Cloudflare for token ${tokenId}...`);
-      const fallbackRes = await axios.get(
-        `https://cloudflare-ipfs.com/ipfs/${ipfsBase}/${tokenId}.jpg`,
-        { responseType: 'arraybuffer' }
-      );
-      nftImageBuffer = fallbackRes.data;
-    }
+    const [nftRes, overlayRes] = await Promise.all([
+      axios.get(nftUrl, { responseType: 'arraybuffer' }),
+      axios.get(overlayUrl, { responseType: 'arraybuffer' })
+    ]);
 
-    const overlayRes = await axios.get(overlayUrl, { responseType: 'arraybuffer' });
-
-    const nftPng = await sharp(nftImageBuffer).resize(1216, 1216).png().toBuffer();
+    const nftPng = await sharp(nftRes.data).resize(1216, 1216).png().toBuffer();
     const overlayPng = await sharp(overlayRes.data).resize(1216, 1216).png().toBuffer();
 
     const resultImage = await sharp(nftPng)
@@ -105,10 +87,9 @@ client.on('messageCreate', async (message) => {
       files: [{ attachment: resultImage, name: `fridayflex_${tokenId}.jpg` }]
     });
   } catch (err) {
-    console.error("❌ FULL ERROR:", err);
+    console.error("❌ Flex failed:", err.message);
     message.reply("😵 Something went wrong flexing your NFT. Try again or check the token ID.");
   }
 });
 
 client.login(process.env.DISCORD_TOKEN);
-
