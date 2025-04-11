@@ -31,7 +31,7 @@ client.on('messageCreate', async (message) => {
   if (!message.content.startsWith('!') || message.author.bot) return;
 
   const content = message.content.slice(1).toLowerCase().trim();
-if (content === 'flex info') {
+if (content === 'help' || content === 'flex info') {
   const available = Object.keys(overlayMap)
     .map(cmd => `• \`!${cmd} [token_id]\``)
     .join('\n');
@@ -44,7 +44,6 @@ if (content === 'flex info') {
     `**Available Flex Styles:**\n${available}`
   );
 }
-
 
   let [command, tokenId] = content.split(/\s+/);
   if (!tokenId) {
