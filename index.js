@@ -9,18 +9,19 @@ const client = new Client({
 
 // Overlay image URLs hosted on Imgur
 const overlayMap = {
-  blueflex: 'https://i.imgur.com/NkPirug.png',
-  brownflex: 'https://i.imgur.com/spRSWyf.png',
-  electroflex: 'https://i.imgur.com/EYUfxtu.png',
-  fireflex: 'https://i.imgur.com/cE2x7cn.png',
-  ghostflex: 'https://i.imgur.com/lY0uHo1.png',
-  goldflex: 'https://i.imgur.com/cn2nkzz.png',
-  greenflex: 'https://i.imgur.com/A1rGGut.png',
-  rainbowflex: 'https://i.imgur.com/hje4nlM.png',
-  toxicflex: 'https://i.imgur.com/9eOTM4N.png',
-  violetflex: 'https://i.imgur.com/iuw9Nco.png',
-  whiteflex: 'https://i.imgur.com/LF0La6C.png'
+  blueflex: 'https://images.weserv.nl/?url=i.imgur.com/NkPirug.png',
+  brownflex: 'https://images.weserv.nl/?url=i.imgur.com/spRSWyf.png',
+  electroflex: 'https://images.weserv.nl/?url=i.imgur.com/EYUfxtu.png',
+  fireflex: 'https://images.weserv.nl/?url=i.imgur.com/cE2x7cn.png',
+  ghostflex: 'https://images.weserv.nl/?url=i.imgur.com/lY0uHo1.png',
+  goldflex: 'https://images.weserv.nl/?url=i.imgur.com/cn2nkzz.png',
+  greenflex: 'https://images.weserv.nl/?url=i.imgur.com/A1rGGut.png',
+  rainbowflex: 'https://images.weserv.nl/?url=i.imgur.com/hje4nlM.png',
+  toxicflex: 'https://images.weserv.nl/?url=i.imgur.com/9eOTM4N.png',
+  violetflex: 'https://images.weserv.nl/?url=i.imgur.com/iuw9Nco.png',
+  whiteflex: 'https://images.weserv.nl/?url=i.imgur.com/LF0La6C.png'
 };
+
 
 const nftIpfsBase = 'https://ipfs.io/ipfs/bafybeigqhrsckizhwjow3dush4muyawn7jud2kbmy3akzxyby457njyr5e';
 
