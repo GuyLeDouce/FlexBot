@@ -22,9 +22,6 @@ const overlayMap = {
   whiteflex: 'https://images.weserv.nl/?url=i.imgur.com/UVc0Yfi.png'
 };
 
-// Always Tired NFT base image location
-const nftIpfsBase = 'https://ipfs.io/ipfs/bafybeigqhrsckizhwjow3dush4muyawn7jud2kbmy3akzxyby457njyr5e';
-
 client.once('ready', () => {
   console.log(`🔥 FridayFlex Bot is live as ${client.user.tag}`);
 });
@@ -64,18 +61,29 @@ client.on('messageCreate', async (message) => {
   }
 
   const overlayUrl = overlayMap[command];
-  const nftUrl = `${nftIpfsBase}/${tokenId}.jpg`;
+
+  let nftImageBuffer;
 
   try {
-    console.log(`🖼️ Loading NFT: ${nftUrl}`);
-    console.log(`🎨 Overlay: ${overlayUrl}`);
+    console.log(`🖼️ Trying ipfs.io for token ${tokenId}`);
+    const nftRes = await axios.get(
+      `https://ipfs.io/ipfs/bafybeigqhrsckizhwjow3dush4muyawn7jud2kbmy3akzxyby457njyr5e/${tokenId}.jpg`,
+      { responseType: 'arraybuffer' }
+    );
+    nftImageBuffer = nftRes.data;
+  } catch (err) {
+    console.warn(`⚠️ ipfs.io failed, retrying with Cloudflare...`);
+    const fallbackRes = await axios.get(
+      `https://cloudflare-ipfs.com/ipfs/bafybeigqhrsckizhwjow3dush4muyawn7jud2kbmy3akzxyby457njyr5e/${tokenId}.jpg`,
+      { responseType: 'arraybuffer' }
+    );
+    nftImageBuffer = fallbackRes.data;
+  }
 
-    const [nftRes, overlayRes] = await Promise.all([
-      axios.get(nftUrl, { responseType: 'arraybuffer' }),
-      axios.get(overlayUrl, { responseType: 'arraybuffer' })
-    ]);
+  try {
+    const overlayRes = await axios.get(overlayUrl, { responseType: 'arraybuffer' });
 
-    const nftPng = await sharp(nftRes.data).resize(1216, 1216).png().toBuffer();
+    const nftPng = await sharp(nftImageBuffer).resize(1216, 1216).png().toBuffer();
     const overlayPng = await sharp(overlayRes.data).resize(1216, 1216).png().toBuffer();
 
     const resultImage = await sharp(nftPng)
@@ -87,7 +95,7 @@ client.on('messageCreate', async (message) => {
       files: [{ attachment: resultImage, name: `fridayflex_${tokenId}.jpg` }]
     });
   } catch (err) {
-    console.error("❌ Flex failed:", err.message);
+    console.error("❌ FULL ERROR:", err);
     message.reply("😵 Something went wrong flexing your NFT. Try again or check the token ID.");
   }
 });
