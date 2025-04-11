@@ -7,22 +7,21 @@ const client = new Client({
   intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent]
 });
 
-// Overlay image URLs hosted on GitHub via raw links
+// Overlay image URLs hosted on Imgur
 const overlayMap = {
-  brownflex: 'https://raw.githubusercontent.com/GuyLeDouce/fridayflex-assets/main/Brown%20Flex.png',
-  ghostflex: 'https://raw.githubusercontent.com/GuyLeDouce/fridayflex-assets/main/Ghost%20Flex.png',
-  toxicflex: 'https://raw.githubusercontent.com/GuyLeDouce/fridayflex-assets/main/Toxic%20Flex.png',
-  fireflex: 'https://raw.githubusercontent.com/GuyLeDouce/fridayflex-assets/main/Fire%20Flex.png',
-  greenflex: 'https://raw.githubusercontent.com/GuyLeDouce/fridayflex-assets/main/Green%20Flex.png',
-  rainbowflex: 'https://raw.githubusercontent.com/GuyLeDouce/fridayflex-assets/main/Rainbow%20Flex.png',
-  whiteflex: 'https://raw.githubusercontent.com/GuyLeDouce/fridayflex-assets/main/White%20Flex.png',
-  redflex: 'https://raw.githubusercontent.com/GuyLeDouce/fridayflex-assets/main/Red%20Flex.png',
-  violetflex: 'https://raw.githubusercontent.com/GuyLeDouce/fridayflex-assets/main/Violet%20Flex.png',
-  blueflex: 'https://raw.githubusercontent.com/GuyLeDouce/fridayflex-assets/main/Blue%20Flex.png',
-  goldflex: 'https://raw.githubusercontent.com/GuyLeDouce/fridayflex-assets/main/Gold%20Flex.png'
+  blueflex: 'https://i.imgur.com/NkPirug.png',
+  brownflex: 'https://i.imgur.com/spRSWyf.png',
+  electroflex: 'https://i.imgur.com/EYUfxtu.png',
+  fireflex: 'https://i.imgur.com/cE2x7cn.png',
+  ghostflex: 'https://i.imgur.com/lY0uHo1.png',
+  goldflex: 'https://i.imgur.com/cn2nkzz.png',
+  greenflex: 'https://i.imgur.com/A1rGGut.png',
+  rainbowflex: 'https://i.imgur.com/hje4nlM.png',
+  toxicflex: 'https://i.imgur.com/9eOTM4N.png',
+  violetflex: 'https://i.imgur.com/iuw9Nco.png',
+  whiteflex: 'https://i.imgur.com/LF0La6C.png'
 };
 
-// NFT image base from IPFS
 const nftIpfsBase = 'https://ipfs.io/ipfs/bafybeigqhrsckizhwjow3dush4muyawn7jud2kbmy3akzxyby457njyr5e';
 
 client.once('ready', () => {
@@ -47,7 +46,7 @@ client.on('messageCreate', async (message) => {
     );
   }
 
-  // Parse the flex command and token ID (with or without space)
+  // Parse the command with or without a space
   let [command, tokenId] = content.split(/\s+/);
   if (!tokenId) {
     for (const key of Object.keys(overlayMap)) {
@@ -94,3 +93,4 @@ client.on('messageCreate', async (message) => {
 });
 
 client.login(process.env.DISCORD_TOKEN);
+
