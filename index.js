@@ -31,19 +31,20 @@ client.on('messageCreate', async (message) => {
   if (!message.content.startsWith('!') || message.author.bot) return;
 
   const content = message.content.slice(1).toLowerCase().trim();
-  if (content === 'help') {
-    const available = Object.keys(overlayMap)
-      .map(cmd => `• \`!${cmd} [token_id]\``)
-      .join('\n');
+if (content === 'flex info') {
+  const available = Object.keys(overlayMap)
+    .map(cmd => `• \`!${cmd} [token_id]\``)
+    .join('\n');
 
-    return message.reply(
-      `🛠️ **FridayFlex Bot Help**\n\n` +
-      `To flex your Always Tired NFT with a themed overlay, use:\n` +
-      `\`!{flexstyle} {token_id}\` or \`!{flexstyle}{token_id}\`\n\n` +
-      `**Example:** \`!fireflex 245\`\n\n` +
-      `**Available Flex Styles:**\n${available}`
-    );
-  }
+  return message.reply(
+    `😴 **FridayFlex Info**\n\n` +
+    `To flex your Always Tired NFT with a themed overlay, use:\n` +
+    `\`!{flexstyle} {token_id}\` or \`!{flexstyle}{token_id}\`\n\n` +
+    `**Example:** \`!fireflex 245\`\n\n` +
+    `**Available Flex Styles:**\n${available}`
+  );
+}
+
 
   let [command, tokenId] = content.split(/\s+/);
   if (!tokenId) {
