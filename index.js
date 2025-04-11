@@ -9,18 +9,19 @@ const client = new Client({
 
 // Proxying Imgur overlays through images.weserv.nl
 const overlayMap = {
-  blueflex: 'https://images.weserv.nl/?url=i.imgur.com/6PSxAwv.png',
-  brownflex: 'https://images.weserv.nl/?url=i.imgur.com/ZVl3vk6.png',
-  electroflex: 'https://images.weserv.nl/?url=i.imgur.com/38btX5R.png',
-  fireflex: 'https://images.weserv.nl/?url=i.imgur.com/KnnpvKM.png',
-  ghostflex: 'https://images.weserv.nl/?url=i.imgur.com/HSlzB4J.png',
-  goldflex: 'https://images.weserv.nl/?url=i.imgur.com/w12nc1d.png',
-  greenflex: 'https://images.weserv.nl/?url=i.imgur.com/hK0tTSx.png',
-  rainbowflex: 'https://images.weserv.nl/?url=i.imgur.com/zZcwiQZ.png',
-  toxicflex: 'https://images.weserv.nl/?url=i.imgur.com/NrU4Wxn.png',
-  violetflex: 'https://images.weserv.nl/?url=i.imgur.com/wyHD66V.png',
-  whiteflex: 'https://images.weserv.nl/?url=i.imgur.com/UVc0Yfi.png'
+  blueflex: 'https://images.weserv.nl/?url=imgur.com/6PSxAwv.png',
+  brownflex: 'https://images.weserv.nl/?url=imgur.com/ZVl3vk6.png',
+  electroflex: 'https://images.weserv.nl/?url=imgur.com/38btX5R.png',
+  fireflex: 'https://images.weserv.nl/?url=imgur.com/KnnpvKM.png',
+  ghostflex: 'https://images.weserv.nl/?url=imgur.com/HSlzB4J.png',
+  goldflex: 'https://images.weserv.nl/?url=imgur.com/w12nc1d.png',
+  greenflex: 'https://images.weserv.nl/?url=imgur.com/hK0tTSx.png',
+  rainbowflex: 'https://images.weserv.nl/?url=imgur.com/zZcwiQZ.png',
+  toxicflex: 'https://images.weserv.nl/?url=imgur.com/NrU4Wxn.png',
+  violetflex: 'https://images.weserv.nl/?url=imgur.com/wyHD66V.png',
+  whiteflex: 'https://images.weserv.nl/?url=imgur.com/UVc0Yfi.png'
 };
+
 
 client.once('ready', () => {
   console.log(`🔥 FridayFlex Bot is live as ${client.user.tag}`);
