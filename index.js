@@ -7,7 +7,7 @@ const client = new Client({
   intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent]
 });
 
-// Flexstyle to overlay image map
+// Overlay map using Pinata gateway and properly encoded filenames
 const overlayMap = {
   brownflex: 'https://black-bitter-reindeer-943.mypinata.cloud/ipfs/bafybeia7ofwilex5o4itjctphxg3jaguyqiaguklae7zlgzzjsmgi3i3vy/Brown%20Flex.png',
   ghostflex: 'https://black-bitter-reindeer-943.mypinata.cloud/ipfs/bafybeia7ofwilex5o4itjctphxg3jaguyqiaguklae7zlgzzjsmgi3i3vy/Ghost%20Flex.png',
@@ -29,7 +29,7 @@ client.once('ready', () => {
 client.on('messageCreate', async (message) => {
   if (!message.content.startsWith('!') || message.author.bot) return;
 
-  const content = message.content.slice(1).toLowerCase().trim(); // strip "!" and normalize
+  const content = message.content.slice(1).toLowerCase().trim(); // remove "!" and normalize
   const helpCommand = content === 'help';
 
   // Handle !help command
@@ -49,10 +49,10 @@ client.on('messageCreate', async (message) => {
     );
   }
 
-  // Try space-split format first
+  // Try space-separated first
   let [command, tokenId] = content.split(/\s+/);
 
-  // Fallback if no space was used (e.g. !fireflex245)
+  // Fallback if no space was used
   if (!tokenId) {
     for (const key of Object.keys(overlayMap)) {
       if (content.startsWith(key)) {
@@ -63,33 +63,38 @@ client.on('messageCreate', async (message) => {
     }
   }
 
-  if (!overlayMap[command]) return; // invalid flex command
+  if (!overlayMap[command]) return;
   if (!tokenId || isNaN(tokenId)) {
     return message.reply("😴 Please include a valid token ID, like `!fireflex 245` or `!fireflex245`.");
   }
 
   const overlayUrl = overlayMap[command];
-  const nftUrl = `https://ipfs.io/ipfs/bafybeigqhrsckizhwjow3dush4muyawn7jud2kbmy3akzxyby457njyr5e/${tokenId}.jpg`;
+  const ipfsBase = 'bafybeigqhrsckizhwjow3dush4muyawn7jud2kbmy3akzxyby457njyr5e';
 
   try {
-    console.log(`🔍 Fetching NFT: ${nftUrl}`);
-    console.log(`🖼️ Using overlay: ${overlayUrl}`);
+    // Try loading NFT image from ipfs.io first
+    let nftImageBuffer;
 
-    const [nftRes, overlayRes] = await Promise.all([
-      axios.get(nftUrl, { responseType: 'arraybuffer' }),
-      axios.get(overlayUrl, { responseType: 'arraybuffer' })
-    ]);
+    try {
+      console.log(`🔍 Trying ipfs.io for token ${tokenId}`);
+      const nftRes = await axios.get(
+        `https://ipfs.io/ipfs/${ipfsBase}/${tokenId}.jpg`,
+        { responseType: 'arraybuffer' }
+      );
+      nftImageBuffer = nftRes.data;
+    } catch (err) {
+      console.warn(`⚠️ ipfs.io failed, retrying with Cloudflare for token ${tokenId}...`);
+      const fallbackRes = await axios.get(
+        `https://cloudflare-ipfs.com/ipfs/${ipfsBase}/${tokenId}.jpg`,
+        { responseType: 'arraybuffer' }
+      );
+      nftImageBuffer = fallbackRes.data;
+    }
 
-    // Normalize both images to PNG before merging
-    const nftPng = await sharp(nftRes.data)
-      .resize(1216, 1216)
-      .png()
-      .toBuffer();
+    const overlayRes = await axios.get(overlayUrl, { responseType: 'arraybuffer' });
 
-    const overlayPng = await sharp(overlayRes.data)
-      .resize(1216, 1216)
-      .png()
-      .toBuffer();
+    const nftPng = await sharp(nftImageBuffer).resize(1216, 1216).png().toBuffer();
+    const overlayPng = await sharp(overlayRes.data).resize(1216, 1216).png().toBuffer();
 
     const resultImage = await sharp(nftPng)
       .composite([{ input: overlayPng, blend: 'over' }])
@@ -106,3 +111,4 @@ client.on('messageCreate', async (message) => {
 });
 
 client.login(process.env.DISCORD_TOKEN);
+
