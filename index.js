@@ -39,7 +39,7 @@ if (content === 'help' || content === 'flex info') {
   return message.reply(
     `😴 **FridayFlex Info**\n\n` +
     `To flex your Always Tired NFT with a Friday Flex overlay, use:\n` +
-    `\`!{flexstlye} {token_id}\` or \`!{flexstyle}{token_id}\`\n\n` +
+    `\`!{Skin Trait} {token_id}\` or \`!{Skin Trait}{token_id}\`\n\n` +
     `**Example:** \`!fireflex 245\`\n\n` +
     `**Available Flex Styles:**\n${available}`
   );
