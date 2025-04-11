@@ -7,22 +7,22 @@ const client = new Client({
   intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent]
 });
 
-// Overlay image URLs hosted on Imgur
+// Proxying Imgur overlays through images.weserv.nl
 const overlayMap = {
-  blueflex: 'https://images.weserv.nl/?url=i.imgur.com/NkPirug.png',
-  brownflex: 'https://images.weserv.nl/?url=i.imgur.com/spRSWyf.png',
-  electroflex: 'https://images.weserv.nl/?url=i.imgur.com/EYUfxtu.png',
-  fireflex: 'https://images.weserv.nl/?url=i.imgur.com/cE2x7cn.png',
-  ghostflex: 'https://images.weserv.nl/?url=i.imgur.com/lY0uHo1.png',
-  goldflex: 'https://images.weserv.nl/?url=i.imgur.com/cn2nkzz.png',
-  greenflex: 'https://images.weserv.nl/?url=i.imgur.com/A1rGGut.png',
-  rainbowflex: 'https://images.weserv.nl/?url=i.imgur.com/hje4nlM.png',
-  toxicflex: 'https://images.weserv.nl/?url=i.imgur.com/9eOTM4N.png',
-  violetflex: 'https://images.weserv.nl/?url=i.imgur.com/iuw9Nco.png',
-  whiteflex: 'https://images.weserv.nl/?url=i.imgur.com/LF0La6C.png'
+  blueflex: 'https://images.weserv.nl/?url=i.imgur.com/6PSxAwv.png',
+  brownflex: 'https://images.weserv.nl/?url=i.imgur.com/ZVl3vk6.png',
+  electroflex: 'https://images.weserv.nl/?url=i.imgur.com/38btX5R.png',
+  fireflex: 'https://images.weserv.nl/?url=i.imgur.com/KnnpvKM.png',
+  ghostflex: 'https://images.weserv.nl/?url=i.imgur.com/HSlzB4J.png',
+  goldflex: 'https://images.weserv.nl/?url=i.imgur.com/w12nc1d.png',
+  greenflex: 'https://images.weserv.nl/?url=i.imgur.com/hK0tTSx.png',
+  rainbowflex: 'https://images.weserv.nl/?url=i.imgur.com/zZcwiQZ.png',
+  toxicflex: 'https://images.weserv.nl/?url=i.imgur.com/NrU4Wxn.png',
+  violetflex: 'https://images.weserv.nl/?url=i.imgur.com/wyHD66V.png',
+  whiteflex: 'https://images.weserv.nl/?url=i.imgur.com/UVc0Yfi.png'
 };
 
-
+// Always Tired NFT base image location
 const nftIpfsBase = 'https://ipfs.io/ipfs/bafybeigqhrsckizhwjow3dush4muyawn7jud2kbmy3akzxyby457njyr5e';
 
 client.once('ready', () => {
@@ -47,7 +47,6 @@ client.on('messageCreate', async (message) => {
     );
   }
 
-  // Parse the command with or without a space
   let [command, tokenId] = content.split(/\s+/);
   if (!tokenId) {
     for (const key of Object.keys(overlayMap)) {
@@ -94,4 +93,3 @@ client.on('messageCreate', async (message) => {
 });
 
 client.login(process.env.DISCORD_TOKEN);
-
