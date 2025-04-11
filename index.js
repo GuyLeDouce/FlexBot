@@ -7,21 +7,20 @@ const client = new Client({
   intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent]
 });
 
-// Proxying Imgur overlays through images.weserv.nl
+// Raw GitHub overlay links
 const overlayMap = {
-  blueflex: 'https://images.weserv.nl/?url=imgur.com/6PSxAwv.png',
-  brownflex: 'https://images.weserv.nl/?url=imgur.com/ZVl3vk6.png',
-  electroflex: 'https://images.weserv.nl/?url=imgur.com/38btX5R.png',
-  fireflex: 'https://images.weserv.nl/?url=imgur.com/KnnpvKM.png',
-  ghostflex: 'https://images.weserv.nl/?url=imgur.com/HSlzB4J.png',
-  goldflex: 'https://images.weserv.nl/?url=imgur.com/w12nc1d.png',
-  greenflex: 'https://images.weserv.nl/?url=imgur.com/hK0tTSx.png',
-  rainbowflex: 'https://images.weserv.nl/?url=imgur.com/zZcwiQZ.png',
-  toxicflex: 'https://images.weserv.nl/?url=imgur.com/NrU4Wxn.png',
-  violetflex: 'https://images.weserv.nl/?url=imgur.com/wyHD66V.png',
-  whiteflex: 'https://images.weserv.nl/?url=imgur.com/UVc0Yfi.png'
+  blueflex: 'https://raw.githubusercontent.com/GuyLeDouce/fridayflex-assets/main/Blue%20Flex.png',
+  brownflex: 'https://raw.githubusercontent.com/GuyLeDouce/fridayflex-assets/main/Brown%20Flex.png',
+  electroflex: 'https://raw.githubusercontent.com/GuyLeDouce/fridayflex-assets/main/Electro%20Flex.png',
+  fireflex: 'https://raw.githubusercontent.com/GuyLeDouce/fridayflex-assets/main/Fire%20Flex.png',
+  ghostflex: 'https://raw.githubusercontent.com/GuyLeDouce/fridayflex-assets/main/Ghost%20Flex.png',
+  goldflex: 'https://raw.githubusercontent.com/GuyLeDouce/fridayflex-assets/main/Gold%20Flex.png',
+  greenflex: 'https://raw.githubusercontent.com/GuyLeDouce/fridayflex-assets/main/Green%20Flex.png',
+  rainbowflex: 'https://raw.githubusercontent.com/GuyLeDouce/fridayflex-assets/main/Rainbow%20Flex.png',
+  toxicflex: 'https://raw.githubusercontent.com/GuyLeDouce/fridayflex-assets/main/Toxic%20Flex.png',
+  violetflex: 'https://raw.githubusercontent.com/GuyLeDouce/fridayflex-assets/main/Violet%20Flex.png',
+  whiteflex: 'https://raw.githubusercontent.com/GuyLeDouce/fridayflex-assets/main/White%20Flex.png'
 };
-
 
 client.once('ready', () => {
   console.log(`🔥 FridayFlex Bot is live as ${client.user.tag}`);
@@ -65,26 +64,26 @@ client.on('messageCreate', async (message) => {
 
   let nftImageBuffer;
 
-try {
-  console.log(`🖼️ Trying ipfs.io for token ${tokenId}`);
-  const nftRes = await axios.get(
-    `https://ipfs.io/ipfs/bafybeigqhrsckizhwjow3dush4muyawn7jud2kbmy3akzxyby457njyr5e/${tokenId}.jpg`,
-    { responseType: 'arraybuffer' }
-  );
-  nftImageBuffer = nftRes.data;
-} catch (err1) {
-  console.warn(`⚠️ ipfs.io failed, retrying with Filebase...`);
   try {
-    const fallbackRes = await axios.get(
-      `https://ipfs.filebase.io/ipfs/bafybeigqhrsckizhwjow3dush4muyawn7jud2kbmy3akzxyby457njyr5e/${tokenId}.jpg`,
+    console.log(`🖼️ Trying ipfs.io for token ${tokenId}`);
+    const nftRes = await axios.get(
+      `https://ipfs.io/ipfs/bafybeigqhrsckizhwjow3dush4muyawn7jud2kbmy3akzxyby457njyr5e/${tokenId}.jpg`,
       { responseType: 'arraybuffer' }
     );
-    nftImageBuffer = fallbackRes.data;
-  } catch (err2) {
-    console.error("❌ All IPFS gateways failed:", err2.message);
-    return message.reply("😵 Failed to load NFT image from IPFS. Please try again later.");
+    nftImageBuffer = nftRes.data;
+  } catch (err1) {
+    console.warn(`⚠️ ipfs.io failed, retrying with Filebase...`);
+    try {
+      const fallbackRes = await axios.get(
+        `https://ipfs.filebase.io/ipfs/bafybeigqhrsckizhwjow3dush4muyawn7jud2kbmy3akzxyby457njyr5e/${tokenId}.jpg`,
+        { responseType: 'arraybuffer' }
+      );
+      nftImageBuffer = fallbackRes.data;
+    } catch (err2) {
+      console.error("❌ All IPFS gateways failed:", err2.message);
+      return message.reply("😵 Failed to load NFT image from IPFS. Please try again later.");
+    }
   }
-}
 
   try {
     const overlayRes = await axios.get(overlayUrl, { responseType: 'arraybuffer' });
@@ -107,3 +106,4 @@ try {
 });
 
 client.login(process.env.DISCORD_TOKEN);
+
