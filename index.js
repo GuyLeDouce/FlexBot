@@ -7,7 +7,6 @@ const client = new Client({
   intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent]
 });
 
-// Flexstyle to overlay image URL map
 const overlayMap = {
   brownflex: 'https://media.discordapp.net/attachments/1068590342003236935/1139523588534317159/IMG_2206.png',
   ghostflex: 'https://media.discordapp.net/attachments/1068590342003236935/1139523589025058817/IMG_2207.png',
@@ -29,12 +28,10 @@ client.once('ready', () => {
 client.on('messageCreate', async (message) => {
   if (!message.content.startsWith('!') || message.author.bot) return;
 
-  const args = message.content.trim().slice(1).split(/\s+/); // split command by space
-  const command = args[0]?.toLowerCase();
-  const tokenId = args[1];
+  const content = message.content.slice(1).toLowerCase().trim(); // remove "!" and lowercase
+  const helpCommand = content === 'help';
 
-  // !help command
-  if (command === 'help') {
+  if (helpCommand) {
     const available = Object.keys(overlayMap)
       .map(cmd => `• \`!${cmd} [token_id]\``)
       .join('\n');
@@ -43,15 +40,28 @@ client.on('messageCreate', async (message) => {
       `🛠️ **FridayFlex Bot Help**\n\n` +
       `To flex your Always Tired NFT with a themed overlay, use:\n` +
       `\`!{flexstyle} {token_id}\`\n\n` +
-      `**Example:** \`!fireflex 245\`\n\n` +
+      `**Example:** \`!fireflex 245\` or \`!fireflex245\`\n\n` +
       `**Available Flex Styles:**\n${available}`
     );
   }
 
-  if (!overlayMap[command]) return; // Ignore unknown commands
+  // Try to split by space first
+  let [command, tokenId] = content.split(/\s+/);
 
+  // If no space was used, try to extract command/tokenId manually
+  if (!tokenId) {
+    for (const key of Object.keys(overlayMap)) {
+      if (content.startsWith(key)) {
+        command = key;
+        tokenId = content.slice(key.length);
+        break;
+      }
+    }
+  }
+
+  if (!overlayMap[command]) return;
   if (!tokenId || isNaN(tokenId)) {
-    return message.reply("😴 Please include a valid token ID, like `!fireflex 245`.");
+    return message.reply("😴 Please include a valid token ID, like `!fireflex 245` or `!fireflex245`.");
   }
 
   const overlayUrl = overlayMap[command];
@@ -81,5 +91,4 @@ client.on('messageCreate', async (message) => {
 });
 
 client.login(process.env.DISCORD_TOKEN);
-
 
