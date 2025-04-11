@@ -64,21 +64,26 @@ client.on('messageCreate', async (message) => {
 
   let nftImageBuffer;
 
+try {
+  console.log(`🖼️ Trying ipfs.io for token ${tokenId}`);
+  const nftRes = await axios.get(
+    `https://ipfs.io/ipfs/bafybeigqhrsckizhwjow3dush4muyawn7jud2kbmy3akzxyby457njyr5e/${tokenId}.jpg`,
+    { responseType: 'arraybuffer' }
+  );
+  nftImageBuffer = nftRes.data;
+} catch (err1) {
+  console.warn(`⚠️ ipfs.io failed, retrying with Filebase...`);
   try {
-    console.log(`🖼️ Trying ipfs.io for token ${tokenId}`);
-    const nftRes = await axios.get(
-      `https://ipfs.io/ipfs/bafybeigqhrsckizhwjow3dush4muyawn7jud2kbmy3akzxyby457njyr5e/${tokenId}.jpg`,
-      { responseType: 'arraybuffer' }
-    );
-    nftImageBuffer = nftRes.data;
-  } catch (err) {
-    console.warn(`⚠️ ipfs.io failed, retrying with Cloudflare...`);
     const fallbackRes = await axios.get(
-      `https://cloudflare-ipfs.com/ipfs/bafybeigqhrsckizhwjow3dush4muyawn7jud2kbmy3akzxyby457njyr5e/${tokenId}.jpg`,
+      `https://ipfs.filebase.io/ipfs/bafybeigqhrsckizhwjow3dush4muyawn7jud2kbmy3akzxyby457njyr5e/${tokenId}.jpg`,
       { responseType: 'arraybuffer' }
     );
     nftImageBuffer = fallbackRes.data;
+  } catch (err2) {
+    console.error("❌ All IPFS gateways failed:", err2.message);
+    return message.reply("😵 Failed to load NFT image from IPFS. Please try again later.");
   }
+}
 
   try {
     const overlayRes = await axios.get(overlayUrl, { responseType: 'arraybuffer' });
