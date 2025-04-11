@@ -29,17 +29,19 @@ client.once('ready', () => {
 client.on('messageCreate', async (message) => {
   if (!message.content.startsWith('!') || message.author.bot) return;
 
-  // Match commands like !fireflex[123]
-  const match = message.content.match(/^!(\w+)\[(\d+)]$/);
-  if (!match) return;
+  const args = message.content.trim().slice(1).split(/\s+/); // split by space
+  const command = args[0]?.toLowerCase();
+  const tokenId = args[1];
 
-  const [, command, tokenId] = match;
-  const overlayUrl = overlayMap[command.toLowerCase()];
-
-  if (!overlayUrl) {
-    return message.reply("😴 That flex command doesn’t exist. Try one like `!fireflex[1234]`.");
+  if (!overlayMap[command]) {
+    return; // silently ignore invalid flex commands
   }
 
+  if (!tokenId || isNaN(tokenId)) {
+    return message.reply("😴 Please include a valid token ID, like `!fireflex 245`.");
+  }
+
+  const overlayUrl = overlayMap[command];
   const nftUrl = `https://ipfs.io/ipfs/bafybeigqhrsckizhwjow3dush4muyawn7jud2kbmy3akzxyby457njyr5e/${tokenId}.jpg`;
 
   try {
@@ -66,3 +68,4 @@ client.on('messageCreate', async (message) => {
 });
 
 client.login(process.env.DISCORD_TOKEN);
+
