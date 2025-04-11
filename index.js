@@ -7,6 +7,7 @@ const client = new Client({
   intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent]
 });
 
+// Flexstyle to overlay image map
 const overlayMap = {
   brownflex: 'https://media.discordapp.net/attachments/1068590342003236935/1139523588534317159/IMG_2206.png',
   ghostflex: 'https://media.discordapp.net/attachments/1068590342003236935/1139523589025058817/IMG_2207.png',
@@ -28,9 +29,10 @@ client.once('ready', () => {
 client.on('messageCreate', async (message) => {
   if (!message.content.startsWith('!') || message.author.bot) return;
 
-  const content = message.content.slice(1).toLowerCase().trim(); // remove "!" and lowercase
+  const content = message.content.slice(1).toLowerCase().trim(); // strip "!" and normalize
   const helpCommand = content === 'help';
 
+  // Handle !help command
   if (helpCommand) {
     const available = Object.keys(overlayMap)
       .map(cmd => `• \`!${cmd} [token_id]\``)
@@ -39,16 +41,18 @@ client.on('messageCreate', async (message) => {
     return message.reply(
       `🛠️ **FridayFlex Bot Help**\n\n` +
       `To flex your Always Tired NFT with a themed overlay, use:\n` +
-      `\`!{flexstyle} {token_id}\`\n\n` +
+      `\`!{flexstyle} {token_id}\`\n` +
+      `or\n` +
+      `\`!{flexstyle}{token_id}\`\n\n` +
       `**Example:** \`!fireflex 245\` or \`!fireflex245\`\n\n` +
       `**Available Flex Styles:**\n${available}`
     );
   }
 
-  // Try to split by space first
+  // Try space-split format first
   let [command, tokenId] = content.split(/\s+/);
 
-  // If no space was used, try to extract command/tokenId manually
+  // Fallback if no space was used (e.g. !fireflex245)
   if (!tokenId) {
     for (const key of Object.keys(overlayMap)) {
       if (content.startsWith(key)) {
@@ -59,7 +63,7 @@ client.on('messageCreate', async (message) => {
     }
   }
 
-  if (!overlayMap[command]) return;
+  if (!overlayMap[command]) return; // invalid flex command
   if (!tokenId || isNaN(tokenId)) {
     return message.reply("😴 Please include a valid token ID, like `!fireflex 245` or `!fireflex245`.");
   }
@@ -68,27 +72,37 @@ client.on('messageCreate', async (message) => {
   const nftUrl = `https://ipfs.io/ipfs/bafybeigqhrsckizhwjow3dush4muyawn7jud2kbmy3akzxyby457njyr5e/${tokenId}.jpg`;
 
   try {
+    console.log(`🔍 Fetching NFT: ${nftUrl}`);
+    console.log(`🖼️ Using overlay: ${overlayUrl}`);
+
     const [nftRes, overlayRes] = await Promise.all([
       axios.get(nftUrl, { responseType: 'arraybuffer' }),
       axios.get(overlayUrl, { responseType: 'arraybuffer' })
     ]);
 
-    const nftImage = await sharp(nftRes.data).resize(1216, 1216).toBuffer();
-    const overlayImage = await sharp(overlayRes.data).resize(1216, 1216).toBuffer();
+    // Normalize both images to PNG before merging
+    const nftPng = await sharp(nftRes.data)
+      .resize(1216, 1216)
+      .png()
+      .toBuffer();
 
-    const resultImage = await sharp(nftImage)
-      .composite([{ input: overlayImage, blend: 'over' }])
-      .jpeg()
+    const overlayPng = await sharp(overlayRes.data)
+      .resize(1216, 1216)
+      .png()
+      .toBuffer();
+
+    const resultImage = await sharp(nftPng)
+      .composite([{ input: overlayPng, blend: 'over' }])
+      .jpeg({ quality: 90 })
       .toBuffer();
 
     await message.reply({
       files: [{ attachment: resultImage, name: `fridayflex_${tokenId}.jpg` }]
     });
   } catch (err) {
-    console.error("❌ Error processing image:", err.message);
+    console.error("❌ FULL ERROR:", err);
     message.reply("😵 Something went wrong flexing your NFT. Try again or check the token ID.");
   }
 });
 
 client.login(process.env.DISCORD_TOKEN);
-
