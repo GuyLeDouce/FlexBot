@@ -9,18 +9,19 @@ const client = new Client({
 
 // Overlay links from Pinata
 const overlayMap = {
-  brownflex: 'https://black-bitter-reindeer-943.mypinata.cloud/ipfs/bafybeia7ofwilex5o4itjctphxg3jaguyqiaguklae7zlgzzjsmgi3i3vy/Brown%20Flex.png',
-  ghostflex: 'https://black-bitter-reindeer-943.mypinata.cloud/ipfs/bafybeia7ofwilex5o4itjctphxg3jaguyqiaguklae7zlgzzjsmgi3i3vy/Ghost%20Flex.png',
-  toxicflex: 'https://black-bitter-reindeer-943.mypinata.cloud/ipfs/bafybeia7ofwilex5o4itjctphxg3jaguyqiaguklae7zlgzzjsmgi3i3vy/Toxic%20Flex.png',
-  fireflex: 'https://black-bitter-reindeer-943.mypinata.cloud/ipfs/bafybeia7ofwilex5o4itjctphxg3jaguyqiaguklae7zlgzzjsmgi3i3vy/Fire%20Flex.png',
-  greenflex: 'https://black-bitter-reindeer-943.mypinata.cloud/ipfs/bafybeia7ofwilex5o4itjctphxg3jaguyqiaguklae7zlgzzjsmgi3i3vy/Green%20Flex.png',
-  rainbowflex: 'https://black-bitter-reindeer-943.mypinata.cloud/ipfs/bafybeia7ofwilex5o4itjctphxg3jaguyqiaguklae7zlgzzjsmgi3i3vy/Rainbow%20Flex.png',
-  whiteflex: 'https://black-bitter-reindeer-943.mypinata.cloud/ipfs/bafybeia7ofwilex5o4itjctphxg3jaguyqiaguklae7zlgzzjsmgi3i3vy/White%20Flex.png',
-  redflex: 'https://black-bitter-reindeer-943.mypinata.cloud/ipfs/bafybeia7ofwilex5o4itjctphxg3jaguyqiaguklae7zlgzzjsmgi3i3vy/Red%20Flex.png',
-  violetflex: 'https://black-bitter-reindeer-943.mypinata.cloud/ipfs/bafybeia7ofwilex5o4itjctphxg3jaguyqiaguklae7zlgzzjsmgi3i3vy/Violet%20Flex.png',
-  blueflex: 'https://black-bitter-reindeer-943.mypinata.cloud/ipfs/bafybeia7ofwilex5o4itjctphxg3jaguyqiaguklae7zlgzzjsmgi3i3vy/Blue%20Flex.png',
-  goldflex: 'https://black-bitter-reindeer-943.mypinata.cloud/ipfs/bafybeia7ofwilex5o4itjctphxg3jaguyqiaguklae7zlgzzjsmgi3i3vy/Gold%20Flex.png'
+  brownflex: 'https://gateway.pinata.cloud/ipfs/bafybeia7ofwilex5o4itjctphxg3jaguyqiaguklae7zlgzzjsmgi3i3vy/Brown%20Flex.png',
+  ghostflex: 'https://gateway.pinata.cloud/ipfs/bafybeia7ofwilex5o4itjctphxg3jaguyqiaguklae7zlgzzjsmgi3i3vy/Ghost%20Flex.png',
+  toxicflex: 'https://gateway.pinata.cloud/ipfs/bafybeia7ofwilex5o4itjctphxg3jaguyqiaguklae7zlgzzjsmgi3i3vy/Toxic%20Flex.png',
+  fireflex: 'https://gateway.pinata.cloud/ipfs/bafybeia7ofwilex5o4itjctphxg3jaguyqiaguklae7zlgzzjsmgi3i3vy/Fire%20Flex.png',
+  greenflex: 'https://gateway.pinata.cloud/ipfs/bafybeia7ofwilex5o4itjctphxg3jaguyqiaguklae7zlgzzjsmgi3i3vy/Green%20Flex.png',
+  rainbowflex: 'https://gateway.pinata.cloud/ipfs/bafybeia7ofwilex5o4itjctphxg3jaguyqiaguklae7zlgzzjsmgi3i3vy/Rainbow%20Flex.png',
+  whiteflex: 'https://gateway.pinata.cloud/ipfs/bafybeia7ofwilex5o4itjctphxg3jaguyqiaguklae7zlgzzjsmgi3i3vy/White%20Flex.png',
+  redflex: 'https://gateway.pinata.cloud/ipfs/bafybeia7ofwilex5o4itjctphxg3jaguyqiaguklae7zlgzzjsmgi3i3vy/Red%20Flex.png',
+  violetflex: 'https://gateway.pinata.cloud/ipfs/bafybeia7ofwilex5o4itjctphxg3jaguyqiaguklae7zlgzzjsmgi3i3vy/Violet%20Flex.png',
+  blueflex: 'https://gateway.pinata.cloud/ipfs/bafybeia7ofwilex5o4itjctphxg3jaguyqiaguklae7zlgzzjsmgi3i3vy/Blue%20Flex.png',
+  goldflex: 'https://gateway.pinata.cloud/ipfs/bafybeia7ofwilex5o4itjctphxg3jaguyqiaguklae7zlgzzjsmgi3i3vy/Gold%20Flex.png'
 };
+
 
 const nftIpfsBase = 'https://ipfs.io/ipfs/bafybeigqhrsckizhwjow3dush4muyawn7jud2kbmy3akzxyby457njyr5e';
 
