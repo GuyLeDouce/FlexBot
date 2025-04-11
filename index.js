@@ -1,12 +1,13 @@
+require('dotenv').config();
 const { Client, GatewayIntentBits } = require('discord.js');
 const axios = require('axios');
 const sharp = require('sharp');
-require('dotenv').config();
 
 const client = new Client({
   intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent]
 });
 
+// Overlay prompt-to-image mapping
 const overlayMap = {
   brownflex: 'https://media.discordapp.net/attachments/1068590342003236935/1139523588534317159/IMG_2206.png',
   ghostflex: 'https://media.discordapp.net/attachments/1068590342003236935/1139523589025058817/IMG_2207.png',
@@ -18,7 +19,7 @@ const overlayMap = {
   redflex: 'https://media.discordapp.net/attachments/1068590342003236935/1139523658730176532/IMG_2209.png',
   violetflex: 'https://media.discordapp.net/attachments/1068590342003236935/1139523659162193991/IMG_2208.png',
   blueflex: 'https://media.discordapp.net/attachments/1068590342003236935/1139523659971690536/IMG_2204.png',
-  goldflex: 'https://media.discordapp.net/attachments/1068590342003236935/1139523660370153594/IMG_2205.png',
+  goldflex: 'https://media.discordapp.net/attachments/1068590342003236935/1139523660370153594/IMG_2205.png'
 };
 
 client.once('ready', () => {
@@ -28,6 +29,7 @@ client.once('ready', () => {
 client.on('messageCreate', async (message) => {
   if (!message.content.startsWith('!') || message.author.bot) return;
 
+  // Match commands like !fireflex[123]
   const match = message.content.match(/^!(\w+)\[(\d+)]$/);
   if (!match) return;
 
@@ -35,8 +37,7 @@ client.on('messageCreate', async (message) => {
   const overlayUrl = overlayMap[command.toLowerCase()];
 
   if (!overlayUrl) {
-    message.reply("😴 Sorry, that flex style doesn't exist.");
-    return;
+    return message.reply("😴 That flex command doesn’t exist. Try one like `!fireflex[1234]`.");
   }
 
   const nftUrl = `https://ipfs.io/ipfs/bafybeigqhrsckizhwjow3dush4muyawn7jud2kbmy3akzxyby457njyr5e/${tokenId}.jpg`;
@@ -44,21 +45,23 @@ client.on('messageCreate', async (message) => {
   try {
     const [nftRes, overlayRes] = await Promise.all([
       axios.get(nftUrl, { responseType: 'arraybuffer' }),
-      axios.get(overlayUrl, { responseType: 'arraybuffer' }),
+      axios.get(overlayUrl, { responseType: 'arraybuffer' })
     ]);
 
     const nftImage = await sharp(nftRes.data).resize(1216, 1216).toBuffer();
     const overlayImage = await sharp(overlayRes.data).resize(1216, 1216).toBuffer();
 
-    const finalImage = await sharp(nftImage)
+    const resultImage = await sharp(nftImage)
       .composite([{ input: overlayImage, blend: 'over' }])
       .jpeg()
       .toBuffer();
 
-    await message.reply({ files: [{ attachment: finalImage, name: `flexed_${tokenId}.jpg` }] });
+    await message.reply({
+      files: [{ attachment: resultImage, name: `fridayflex_${tokenId}.jpg` }]
+    });
   } catch (err) {
-    console.error(err);
-    message.reply('😵 Something went wrong generating your Flex. Try again!');
+    console.error("❌ Error processing image:", err.message);
+    message.reply("😵 Something went wrong flexing your NFT. Try again or check the token ID.");
   }
 });
 
