@@ -1,0 +1,17 @@
+{
+  "name": "fridayflex-bot",
+  "version": "1.0.0",
+  "description": "Discord bot that overlays FridayFlex images onto Always Tired NFTs",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "Guy LeDouce",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.6.7",
+    "discord.js": "^14.14.1",
+    "dotenv": "^16.3.1",
+    "sharp": "^0.33.3"
+  }
+}
