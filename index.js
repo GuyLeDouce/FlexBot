@@ -31,19 +31,19 @@ client.on('messageCreate', async (message) => {
   if (!message.content.startsWith('!') || message.author.bot) return;
 
   const content = message.content.slice(1).toLowerCase().trim();
-if (content === 'help' || content === 'flex info') {
-  const available = Object.keys(overlayMap)
-    .map(cmd => `• \`!${cmd} [token_id]\``)
-    .join('\n');
+  if (content === 'help' || content === 'flex info') {
+    const available = Object.keys(overlayMap)
+      .map(cmd => `• \`!${cmd} [token_id]\``)
+      .join('\n');
 
-  return message.reply(
-    `😴 **FridayFlex Info**\n\n` +
-    `To flex your Always Tired NFT with a Friday Flex overlay, use:\n` +
-    `\`!{Skin Trait} {token_id}\` or \`!{Skin Trait}{token_id}\`\n\n` +
-    `**Example:** \`!fireflex 245\`\n\n` +
-    `**Available Flex Styles:**\n${available}`
-  );
-}
+    return message.reply(
+      `😴 **FridayFlex Info**\n\n` +
+      `To flex your Always Tired NFT with a Friday Flex overlay, use:\n` +
+      `\`!{Skin Trait} {token_id}\` or \`!{Skin Trait}{token_id}\`\n\n` +
+      `**Example:** \`!fireflex 245\`\n\n` +
+      `**Available Flex Styles:**\n${available}`
+    );
+  }
 
   let [command, tokenId] = content.split(/\s+/);
   if (!tokenId) {
@@ -62,43 +62,42 @@ if (content === 'help' || content === 'flex info') {
   }
 
   const overlayUrl = overlayMap[command];
-
   let nftImageBuffer;
 
   try {
-    console.log(`🖼️ Trying ipfs.io for token ${tokenId}`);
+    console.log(`🖼️ Trying chlewigen IPFS for token ${tokenId}`);
     const nftRes = await axios.get(
-  `https://ipfs.chlewigen.ch/ipfs/QmcMWvNKhSzFqbvyCdcaiuBgQLTSEmHXWjys2N1dBUAHFe/${tokenId}.jpg`,
-  { responseType: 'arraybuffer' }
-);
+      `https://ipfs.chlewigen.ch/ipfs/QmcMWvNKhSzFqbvyCdcaiuBgQLTSEmHXWjys2N1dBUAHFe/${tokenId}.jpg`,
+      { responseType: 'arraybuffer' }
+    );
     nftImageBuffer = nftRes.data;
   } catch (err1) {
-    console.warn(`⚠️ ipfs.io failed, retrying with Filebase...`);
+    console.warn(`⚠️ chlewigen failed... trying Cloudflare IPFS...`);
     try {
-  const fallbackRes = await axios.get(
-    `https://cloudflare-ipfs.com/ipfs/QmcMWvNKhSzFqbvyCdcaiuBgQLTSEmHXWjys2N1dBUAHFe/${tokenId}.jpg`,
-    { responseType: 'arraybuffer' }
-  );
-  nftImageBuffer = fallbackRes.data;
-} catch (err2) {
-  console.warn(`⚠️ Cloudflare IPFS failed too... trying OpenSea API...`);
+      const fallbackRes = await axios.get(
+        `https://cloudflare-ipfs.com/ipfs/QmcMWvNKhSzFqbvyCdcaiuBgQLTSEmHXWjys2N1dBUAHFe/${tokenId}.jpg`,
+        { responseType: 'arraybuffer' }
+      );
+      nftImageBuffer = fallbackRes.data;
+    } catch (err2) {
+      console.warn(`⚠️ Cloudflare failed... trying OpenSea...`);
+      try {
+        const metadataRes = await axios.get(
+          `https://api.opensea.io/api/v1/asset/0x3ccbd9c381742c04d81332b5db461951672f6a99/${tokenId}/`,
+          { headers: { 'Accept': 'application/json' } }
+        );
 
-  try {
-    const metadataRes = await axios.get(
-      `https://api.opensea.io/api/v1/asset/0x3ccbd9c381742c04d81332b5db461951672f6a99/${tokenId}/`,
-      { headers: { 'Accept': 'application/json' } }
-    );
+        const imageUrl = metadataRes.data.image_url;
+        if (!imageUrl) throw new Error("No image found in OpenSea metadata");
 
-    const imageUrl = metadataRes.data.image_url;
-    if (!imageUrl) throw new Error("No image found in OpenSea metadata");
-
-    const openseaImageRes = await axios.get(imageUrl, { responseType: 'arraybuffer' });
-    nftImageBuffer = openseaImageRes.data;
-  } catch (err3) {
-    console.error("❌ All image sources failed:", err3.message);
-    return message.reply("😵 Failed to load NFT image from IPFS or OpenSea. Please try again later.");
+        const openseaImageRes = await axios.get(imageUrl, { responseType: 'arraybuffer' });
+        nftImageBuffer = openseaImageRes.data;
+      } catch (err3) {
+        console.error("❌ All image sources failed:", err3.message);
+        return message.reply("😵 Failed to load NFT image from IPFS or OpenSea. Please try again later.");
+      }
+    }
   }
-}
 
   try {
     const overlayRes = await axios.get(overlayUrl, { responseType: 'arraybuffer' });
@@ -121,4 +120,3 @@ if (content === 'help' || content === 'flex info') {
 });
 
 client.login(process.env.DISCORD_TOKEN);
-
