@@ -85,7 +85,7 @@ if (content === 'help' || content === 'flex info') {
 
   try {
     const metadataRes = await axios.get(
-      `https://api.opensea.io/api/v1/asset/0xAfF93C4D2eDf14994c4c28fA405588D8D3C0b604/${tokenId}/`,
+      `https://api.opensea.io/api/v1/asset/0x3ccbd9c381742c04d81332b5db461951672f6a99/${tokenId}/`,
       { headers: { 'Accept': 'application/json' } }
     );
 
