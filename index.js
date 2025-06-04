@@ -7,7 +7,7 @@ const client = new Client({
   intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent]
 });
 
-// Raw GitHub overlay links
+// === Overlay Image Map ===
 const overlayMap = {
   blueflex: 'https://raw.githubusercontent.com/GuyLeDouce/fridayflex-assets/main/Blue%20Flex.png',
   brownflex: 'https://raw.githubusercontent.com/GuyLeDouce/fridayflex-assets/main/Brown%20Flex.png',
@@ -23,8 +23,19 @@ const overlayMap = {
   whiteflex: 'https://raw.githubusercontent.com/GuyLeDouce/fridayflex-assets/main/White%20Flex.png'
 };
 
+// === Sale Alert Config ===
+const OPENSEA_API_KEY = process.env.OPENSEA_API_KEY;
+const SALE_CONTRACT = '0x3ccbd9c381742c04d81332b5db461951672f6a99';
+const GEN_CHAT_ID = '943847326093561910';
+let lastSaleTime = Math.floor(Date.now() / 1000) - 14000;
+
 client.once('ready', () => {
   console.log(`🔥 FridayFlex Bot is live as ${client.user.tag}`);
+
+  // Check for new OpenSea sales every 60 seconds
+  setInterval(() => {
+    checkOpenSeaSales();
+  }, 60 * 1000);
 });
 
 client.on('messageCreate', async (message) => {
@@ -83,7 +94,7 @@ client.on('messageCreate', async (message) => {
       console.warn(`⚠️ Cloudflare failed... trying OpenSea...`);
       try {
         const metadataRes = await axios.get(
-          `https://api.opensea.io/api/v1/asset/0x3ccbd9c381742c04d81332b5db461951672f6a99/${tokenId}/`,
+          `https://api.opensea.io/api/v1/asset/${SALE_CONTRACT}/${tokenId}/`,
           { headers: { 'Accept': 'application/json' } }
         );
 
@@ -118,5 +129,55 @@ client.on('messageCreate', async (message) => {
     message.reply("😵 Something went wrong flexing your NFT. Try again or check the token ID.");
   }
 });
+
+async function checkOpenSeaSales() {
+  try {
+    const res = await axios.get(`https://api.opensea.io/api/v2/events`, {
+      headers: { 'x-api-key': OPENSEA_API_KEY },
+      params: {
+        event_type: 'sale',
+        asset_contract_address: SALE_CONTRACT,
+        occurred_after: lastSaleTime,
+        limit: 5
+      }
+    });
+
+    const events = res.data.asset_events || [];
+    if (events.length > 0) {
+      const channel = await client.channels.fetch(GEN_CHAT_ID);
+      for (const event of events) {
+        const { asset, buyer_address, total_price, payment_token } = event;
+
+        const tokenId = asset.token_id;
+        const price = payment_token
+          ? (parseFloat(total_price) / Math.pow(10, payment_token.decimals)).toFixed(4)
+          : '?';
+
+        const buyer = buyer_address?.address?.toLowerCase() || 'unknown wallet';
+        const permalink = asset.permalink || `https://opensea.io/assets/ethereum/${SALE_CONTRACT}/${tokenId}`;
+        const imageUrl = asset.image_url;
+
+        const embed = {
+          title: `🔥 ALWAYS TIRED NFT SOLD!`,
+          description:
+            `🎉 Token \`#${tokenId}\` just SOLD on OpenSea!\n\n` +
+            `💰 **Buyer:** \`${buyer}\`\n` +
+            `💸 **Price:** ${price} ${payment_token?.symbol || ''}\n` +
+            `🔗 [View on OpenSea](${permalink})`,
+          image: { url: imageUrl },
+          color: 0xff9900,
+          footer: { text: `Let's goooo. STAY TIRED.` }
+        };
+
+        await channel.send({ content: '<@everyone>', embeds: [embed] });
+      }
+
+      const newest = Math.max(...events.map(e => new Date(e.created_date).getTime() / 1000));
+      lastSaleTime = newest;
+    }
+  } catch (err) {
+    console.error("❌ Error checking OpenSea sales:", err.response?.data || err.message);
+  }
+}
 
 client.login(process.env.DISCORD_TOKEN);
