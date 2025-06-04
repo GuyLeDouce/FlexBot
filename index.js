@@ -146,8 +146,12 @@ async function checkOpenSeaSales() {
     if (events.length > 0) {
       const channel = await client.channels.fetch(GEN_CHAT_ID);
       for (const event of events) {
-        const { asset, buyer_address, total_price, payment_token } = event;
+        if (!event.asset || !event.asset.token_id) {
+          console.warn('⚠️ Skipped malformed sale event:', event);
+          continue;
+        }
 
+        const { asset, buyer_address, total_price, payment_token } = event;
         const tokenId = asset.token_id;
         const price = payment_token
           ? (parseFloat(total_price) / Math.pow(10, payment_token.decimals)).toFixed(4)
@@ -181,3 +185,4 @@ async function checkOpenSeaSales() {
 }
 
 client.login(process.env.DISCORD_TOKEN);
+
